@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <stdbool.h>
+#include <sys/un.h>
 
 #include "debug.h"
 #include "client.h"
@@ -30,6 +31,12 @@
 #include "login.h"
 #include "tcpmux.h"
 #include "proxy.h"
+
+#ifndef true
+#define true 1
+#define false 0
+#define bool _Bool
+#endif
 
 static struct control *main_ctl;
 static bool xfrpc_status;
@@ -445,6 +452,27 @@ static void new_work_connection(struct bufferevent *bev, struct tmux_stream *str
 	// Cleanup
 	SAFE_FREE(work_conn_msg);
 	SAFE_FREE(work_c);
+}
+
+struct bufferevent* connect_unix_server(struct event_base *base, const char *path){
+	// Create new bufferevent socket
+	struct bufferevent *bev = bufferevent_socket_new(base, -1, BEV_OPT_CLOSE_ON_FREE);
+	if (!bev) {
+		debug(LOG_ERR, "Failed to create new bufferevent socket");
+		return NULL;
+	}
+
+	// connect unix socket
+	struct sockaddr_un addr = {0};
+	addr.sun_family = AF_UNIX;
+	memcpy(addr.sun_path, path, strlen(path));
+	if (bufferevent_socket_connect(bev, (struct sockaddr*) &addr, sizeof(addr)) < 0) {
+		debug(LOG_ERR, "Unix socket connection failed to %s", path);
+		// bufferevent_free(bev);
+		// return NULL;
+	}
+
+	return bev;
 }
 
 /**
@@ -923,8 +951,8 @@ static void handle_type_start_work_conn(struct msg_hdr *msg, int len, void *ctx)
     client->ps = ps;
 
     int remaining_len = len - sizeof(struct msg_hdr) - msg_hton(msg->length);
-    debug(LOG_DEBUG, "Proxy service [%s] [%s:%d] starting work connection. Remaining data length %d",
-          sr->proxy_name, ps->local_ip, ps->local_port, remaining_len);
+    debug(LOG_DEBUG, "Proxy service [%s] [%s:%d] (%s) starting work connection. Remaining data length %d",
+          sr->proxy_name, ps->local_ip, ps->local_port, ps->local_addr, remaining_len);
 
     if (remaining_len > 0) {
         client->data_tail_size = remaining_len;
@@ -932,8 +960,8 @@ static void handle_type_start_work_conn(struct msg_hdr *msg, int len, void *ctx)
         debug(LOG_DEBUG, "Data tail is %s", client->data_tail);
     }
 
-    start_xfrp_tunnel(client);
-    set_client_work_start(client, 1);
+    if(start_xfrp_tunnel(client))
+	    set_client_work_start(client, 1);
     SAFE_FREE(sr);
 }
 

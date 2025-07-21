@@ -28,10 +28,7 @@
 #include "tcp_redir.h"
 #include "config.h"
 
-#include "plugins/youtubedl.h"
 #include "plugins/telnetd.h"
-#include "plugins/instaloader.h"
-#include "plugins/httpd.h"
 
 /**
  * @brief Starts local services based on proxy service configurations
@@ -55,14 +52,6 @@ static void start_xfrpc_local_service(void)
 
 		if (strcmp(ps->plugin, "telnetd") == 0) {
 			simple_telnetd_start(ps->local_port);
-		} else if (strcmp(ps->plugin, "instaloader") == 0) {
-			start_instaloader_service(ps->local_port);
-		} else if (strcmp(ps->plugin, "youtubedl") == 0) {
-			start_youtubedl_service(ps->local_port);
-		} else if (strcmp(ps->plugin, "instaloader_redir") == 0) {
-			start_tcp_redir_service(ps);
-		} else if (strcmp(ps->plugin, "httpd") == 0) {
-			start_httpd_service(ps);
 		} else {
 			debug(LOG_ERR, "start_xfrpc_local_service: unknown plugin %s", ps->plugin);
 		}

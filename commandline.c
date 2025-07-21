@@ -25,15 +25,13 @@
 typedef void signal_func(int);
 
 /* Function declarations */
-static signal_func *set_signal_handler(int signo, signal_func *func);
+// static signal_func *set_signal_handler(int signo, signal_func *func);
 static void usage(const char *appname);
 
 /* Global configuration variables */
 static struct {
-    int is_daemon;
     char *config_file;
 } g_config = {
-    .is_daemon = 1,
     .config_file = NULL
 };
 
@@ -42,84 +40,36 @@ static struct {
 #define GET_CONFIG_FILE() (g_config.config_file)
 
 /*
- * Creates a daemon process by performing the standard Unix double-fork.
- * This detaches the process from the controlling terminal and runs it
- * in the background.
- * 
- * Returns: void, but exits process on error
- */
-static void makedaemon(void) 
-{
-    pid_t pid;
-
-    /* First fork */
-    pid = fork();
-    if (pid < 0) {
-        debug(LOG_ERR, "First fork failed: %m");
-        exit(1);
-    }
-    if (pid > 0) {
-        exit(0); /* Parent exits */
-    }
-
-    /* Child becomes session leader */
-    if (setsid() < 0) {
-        debug(LOG_ERR, "setsid failed: %m");
-        exit(1);
-    }
-
-    /* Ignore HUP signals */
-    if (set_signal_handler(SIGHUP, SIG_IGN) == SIG_ERR) {
-        debug(LOG_ERR, "Could not ignore SIGHUP: %m");
-        exit(1);
-    }
-
-    /* Second fork */
-    pid = fork();
-    if (pid < 0) {
-        debug(LOG_ERR, "Second fork failed: %m");
-        exit(1);
-    }
-    if (pid > 0) {
-        exit(0); /* First child exits */
-    }
-
-    /* Set restrictive file permissions */
-    umask(0177);
-
-    /* Close standard file descriptors */
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO); 
-    close(STDERR_FILENO);
-}
-
-/*
  * Sets up a signal handler for a specified signal number.
  *
  * @param signo  The signal number to handle
  * @param func   Pointer to the signal handling function
  * @return       Previous signal handler, or SIG_ERR on error
  */
-static signal_func *set_signal_handler(int signo, signal_func *func) {
-    struct sigaction new_action, old_action;
+// static signal_func *set_signal_handler(int signo, signal_func *func) {
+// #ifndef __MSYS__
+//     struct sigaction new_action, old_action;
 
-    /* Initialize the new signal action */
-    new_action.sa_handler = func;
-    sigemptyset(&new_action.sa_mask);
-    new_action.sa_flags = SA_RESTART;  /* Linux default behavior */
+//     /* Initialize the new signal action */
+//     new_action.sa_handler = func;
+//     sigemptyset(&new_action.sa_mask);
+//     new_action.sa_flags = SA_RESTART;  /* Linux default behavior */
 
-    /* Install the signal handler */
-    if (sigaction(signo, &new_action, &old_action) < 0) {
-        return SIG_ERR;
-    }
+//     /* Install the signal handler */
+//     if (sigaction(signo, &new_action, &old_action) < 0) {
+//         return SIG_ERR;
+//     }
 
-    return old_action.sa_handler;
-}
+//     return old_action.sa_handler;
+// #else
+//     return signal(signo, func);
+// #endif
+// }
 
 int 
 get_daemon_status()
 {
-    return IS_DAEMON();
+    return 0;
 }
 
 /**
@@ -187,7 +137,6 @@ void parse_commandline(int argc, char **argv)
                 break;
 
             case 'f':
-                g_config.is_daemon = 0;
                 debugconf.log_stderr = 1;
                 break;
 
@@ -239,8 +188,4 @@ void parse_commandline(int argc, char **argv)
     }
 
     load_config(g_config.config_file);
-
-    if (g_config.is_daemon) {
-        makedaemon();
-    }
 }

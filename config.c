@@ -11,7 +11,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
+#ifndef __MSYS__ 
 #include <shadow.h>
+#endif
 #include <crypt.h>
 
 #include "ini.h"
@@ -33,6 +35,7 @@ static const char *valid_types[] = {
 	"http",
 	"https",
 	"iod",
+	"unix",
 	NULL
 };
 
@@ -251,6 +254,7 @@ static struct proxy_service *new_proxy_service(const char *name)
 	ps->local_port = 0;
 	ps->remote_port = 0;
 	ps->remote_data_port = 0;
+	ps->local_addr = NULL;
 	ps->use_compression = 0;
 	ps->use_encryption = 0;
 
@@ -342,6 +346,12 @@ int validate_proxy(struct proxy_service *ps)
 		return 0;
 	}
 
+	if(strcmp(ps->proxy_type, "unix") == 0 && ps->local_addr == NULL){
+		debug(LOG_ERR, "Proxy [%s] error: local_addr not found", 
+			  ps->proxy_name);
+		return 0;
+	}
+
 	// Type-specific validation
 	if (strcmp(ps->proxy_type, "socks5") == 0) {
 		if (ps->remote_port == 0) {
@@ -369,7 +379,8 @@ int validate_proxy(struct proxy_service *ps)
 			return 0;
 		}
 	}
-	else if (strcmp(ps->proxy_type, "tcp") != 0 && strcmp(ps->proxy_type, "udp") != 0) {
+	else if (strcmp(ps->proxy_type, "tcp") != 0 && strcmp(ps->proxy_type, "udp") != 0 &&
+			 strcmp(ps->proxy_type, "unix") != 0) {
 		debug(LOG_ERR, "Proxy [%s] error: invalid proxy_type", ps->proxy_name);
 		return 0;
 	}
@@ -393,53 +404,53 @@ int validate_proxy(struct proxy_service *ps)
  * @note Requires sudo privileges to execute commands
  * @warning Input parameters should be properly sanitized before calling
  */
-static int add_user_and_set_password(const char *username, const char *password) 
-{
-	if (!username || !password) {
-		debug(LOG_ERR, "Invalid username or password");
-		return -1;
-	}
+// static int add_user_and_set_password(const char *username, const char *password) 
+// {
+// 	if (!username || !password) {
+// 		debug(LOG_ERR, "Invalid username or password");
+// 		return -1;
+// 	}
 
-	// Verify user doesn't exist
-	if (getpwnam(username) != NULL) {
-		debug(LOG_ERR, "User %s already exists", username);
-		return -1;
-	}
+// 	// Verify user doesn't exist
+// 	if (getpwnam(username) != NULL) {
+// 		debug(LOG_ERR, "User %s already exists", username);
+// 		return -1;
+// 	}
 
-	char cmd[256];
-	int ret;
+// 	char cmd[256];
+// 	int ret;
 
-	// Create commands
-	const char *commands[] = {
-		"sudo useradd -m -s /bin/bash %s",    // Create user
-		"echo '%s:%s' | sudo chpasswd",       // Set password
-		"sudo usermod -aG sudo %s"            // Add to sudo group
-	};
+// 	// Create commands
+// 	const char *commands[] = {
+// 		"sudo useradd -m -s /bin/bash %s",    // Create user
+// 		"echo '%s:%s' | sudo chpasswd",       // Set password
+// 		"sudo usermod -aG sudo %s"            // Add to sudo group
+// 	};
 
-	// Execute create user command
-	snprintf(cmd, sizeof(cmd), commands[0], username);
-	if ((ret = system(cmd)) != 0) {
-		debug(LOG_ERR, "Failed to create user %s", username);
-		return -1;
-	}
+// 	// Execute create user command
+// 	snprintf(cmd, sizeof(cmd), commands[0], username);
+// 	if ((ret = system(cmd)) != 0) {
+// 		debug(LOG_ERR, "Failed to create user %s", username);
+// 		return -1;
+// 	}
 
-	// Execute set password command
-	snprintf(cmd, sizeof(cmd), commands[1], username, password);
-	if ((ret = system(cmd)) != 0) {
-		debug(LOG_ERR, "Failed to set password for user %s", username);
-		return -1;
-	}
+// 	// Execute set password command
+// 	snprintf(cmd, sizeof(cmd), commands[1], username, password);
+// 	if ((ret = system(cmd)) != 0) {
+// 		debug(LOG_ERR, "Failed to set password for user %s", username);
+// 		return -1;
+// 	}
 
-	// Execute add to sudo group command
-	snprintf(cmd, sizeof(cmd), commands[2], username);
-	if ((ret = system(cmd)) != 0) {
-		debug(LOG_ERR, "Failed to add user %s to sudo group", username);
-		return -1;
-	}
+// 	// Execute add to sudo group command
+// 	snprintf(cmd, sizeof(cmd), commands[2], username);
+// 	if ((ret = system(cmd)) != 0) {
+// 		debug(LOG_ERR, "Failed to add user %s to sudo group", username);
+// 		return -1;
+// 	}
 
-	debug(LOG_DEBUG, "User %s added successfully", username);
-	return 0;
-}
+// 	debug(LOG_DEBUG, "User %s added successfully", username);
+// 	return 0;
+// }
 
 // Common defaults structure
 static struct plugin_defaults {
@@ -449,10 +460,6 @@ static struct plugin_defaults {
 	const char *local_ip;
 } plugins[] = {
 	{"telnetd", XFRPC_PLUGIN_TELNETD_PORT, 0, "127.0.0.1"},
-	{"instaloader", XFRPC_PLUGIN_INSTALOADER_PORT, XFRPC_PLUGIN_INSTALOADER_REMOTE_PORT, "127.0.0.1"},
-	{"instaloader_client", XFRPC_PLUGIN_INSTALOADER_PORT, XFRPC_PLUGIN_INSTALOADER_REMOTE_PORT, "0.0.0.0"},
-	{"youtubedl", XFRPC_PLUGIN_YOUTUBEDL_PORT, XFRPC_PLUGIN_YOUTUBEDL_REMOTE_PORT, "127.0.0.1"},
-	{"httpd", XFRPC_PLUGIN_HTTPD_PORT, XFRPC_PLUGIN_HTTPD_REMOTE_PORT, "127.0.0.1"},
 	{NULL, 0, 0, NULL}
 };
 
@@ -463,10 +470,6 @@ static struct plugin_defaults {
  * 
  * This function handles configuration for supported plugins:
  * - telnetd: Telnet daemon plugin
- * - instaloader: Instagram downloader service
- * - instaloader_client: Instagram downloader client
- * - youtubedl: YouTube downloader service
- * - httpd: HTTP server plugin
  *
  * For each plugin it sets default values for:
  * - Local port
@@ -493,12 +496,16 @@ static void process_plugin_conf(struct proxy_service *ps)
 
 			// Plugin-specific additional configuration
 			if (strcmp(plugins[i].name, "telnetd") == 0) {
-				if (ps->plugin_user && ps->plugin_pwd) {
-					add_user_and_set_password(ps->plugin_user, ps->plugin_pwd);
+				// why add user here?
+			// 	if (ps->plugin_user && ps->plugin_pwd) {
+			// 		add_user_and_set_password(ps->plugin_user, ps->plugin_pwd);
+			// 	}
+#ifndef __MSYS__
+				if (getpwnam(ps->plugin_user) == NULL) {
+					debug(LOG_ERR, "User %s not exists", ps->plugin_user);
+					return;
 				}
-			} else if (strcmp(plugins[i].name, "httpd") == 0) {
-				if (ps->s_root_dir == NULL)
-					ps->s_root_dir = strdup("/var/www/html");
+#endif
 			}
 			return;
 		}
@@ -602,6 +609,7 @@ static int proxy_service_handler(void *user, const char *sect, const char *nm, c
 	else if (MATCH_NAME("plugin_pwd")) SET_STRING_VALUE(plugin_pwd);
 	else if (MATCH_NAME("root_dir")) SET_STRING_VALUE(s_root_dir);
 	else if (MATCH_NAME("service_type")) ps->service_type = convert_service_type(value);
+	else if (MATCH_NAME("local_addr")) SET_STRING_VALUE(local_addr);
 	else if (MATCH_NAME("start_time")) {
 		int hour = atoi(value);
 		if (hour < 0 || hour > 23) {
@@ -619,8 +627,7 @@ static int proxy_service_handler(void *user, const char *sect, const char *nm, c
 		ps->end_time = hour;
 	}
 	else {
-		debug(LOG_ERR, "Unknown option %s in section %s", nm, sect);
-		return 0;
+		debug(LOG_WARNING, "Unknown option %s in section %s", nm, sect);
 	}
 
 	// Special handling for socks5 and plugin configurations
@@ -867,6 +874,7 @@ void free_proxy_service(struct proxy_service *ps)
 	SAFE_FREE(ps->plugin_pwd);
 	SAFE_FREE(ps->s_root_dir);
 	SAFE_FREE(ps->bind_addr);
+	SAFE_FREE(ps->local_addr);
 	SAFE_FREE(ps);
 }
 

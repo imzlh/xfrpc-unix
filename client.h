@@ -90,6 +90,7 @@ struct proxy_service {
 	int     remote_port;
 	int     remote_data_port;
 	int     local_port;
+	char	*local_addr; // for unix domain socket
 
 	/* Time control */
 	int     start_time;    /* Start time (0-23) */
@@ -124,7 +125,7 @@ struct proxy_service {
 };
 
 /* Function prototypes */
-void start_xfrp_tunnel(struct proxy_client *client);
+int start_xfrp_tunnel(struct proxy_client *client);
 void del_proxy_client_by_stream_id(uint32_t sid);
 struct proxy_client *get_proxy_client(uint32_t sid);
 int send_client_data_tail(struct proxy_client *client);

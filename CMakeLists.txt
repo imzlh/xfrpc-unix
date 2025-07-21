@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.5...3.27)
 project(xfrp C)
 
 # Build options
-option(DEBUG "Enable debug mode" OFF)
+option(DEBUG "Enable debug mode" ON)
 option(THIRDPARTY_STATIC_BUILD "Build with static third party libraries" OFF)
 option(ENABLE_SANITIZER "Enable sanitizer(Debug+Gcc/Clang/AppleClang)" ON)
 
@@ -81,15 +81,11 @@ set(PROXY_SOURCES
     proxy.c
     tcpmux.c
     tcp_redir.c
-    mongoose.c
     iod_proto.c
 )
 
 set(PLUGIN_SOURCES
     plugins/telnetd.c
-    plugins/instaloader.c
-    plugins/httpd.c
-    plugins/youtubedl.c
 )
 
 # Combine all sources

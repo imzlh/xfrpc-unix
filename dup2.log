@@ -1,0 +1,160 @@
+==2483== Memcheck, a memory error detector
+==2483== Copyright (C) 2002-2024, and GNU GPL'd, by Julian Seward et al.
+==2483== Using Valgrind-3.24.0 and LibVEX; rerun with -h for copyright info
+==2483== Command: ./xfrpc -c xfrpc.ini -d 7
+==2483== 
+[7][Mon Jul 21 00:58:53 2025][2483](config.c:793) Reading configuration file 'xfrpc.ini'
+[7][Mon Jul 21 00:58:53 2025][2483](config.c:127) Section[common]: {server_addr:192.168.1.10, server_port:7000, auth_token:(null), interval:30, timeout:90}
+[7][Mon Jul 21 00:58:53 2025][2483](config.c:173) Proxy service 0: {name:ssh, local_port:0, type:unix, use_encryption:0, use_compression:0, custom_domains:(null), subdomain:(null), locations:(null), host_header_rewrite:(null), http_user:(null), http_pwd:(null)}
+[7][Mon Jul 21 00:58:53 2025][2483](tcpmux.c:66) Added stream 1 to hash table
+[7][Mon Jul 21 00:58:53 2025][2483](tcpmux.c:210) Initialized stream 1 with state 0
+[6][Mon Jul 21 00:58:53 2025][2483](control.c:1515) Connecting to server [192.168.1.10:7000]...
+[7][Mon Jul 21 00:58:53 2025][2483](control.c:74) xfrpc connection status set to: disconnected
+[7][Mon Jul 21 00:58:53 2025][2483](tcpmux.c:115) Cleared all streams from hash table
+[7][Mon Jul 21 00:58:53 2025][2483](client.c:483) No proxy clients to clear
+[7][Mon Jul 21 00:58:53 2025][2483](tcpmux.c:66) Added stream 3 to hash table
+[7][Mon Jul 21 00:58:53 2025][2483](tcpmux.c:210) Initialized stream 3 with state 0
+[7][Mon Jul 21 00:58:53 2025][2483](control.c:2122) Reinitialized TCP mux stream with session ID 3
+[6][Mon Jul 21 00:58:53 2025][2483](control.c:1389) Successfully connected to xfrp server
+[7][Mon Jul 21 00:58:53 2025][2483](tcpmux.c:352) Sent window update: stream=3, delta=0, flags=1
+[7][Mon Jul 21 00:58:53 2025][2483](control.c:1619) Sending login request: length=193
+[7][Mon Jul 21 00:58:53 2025][2483](control.c:1681) Sending message: type=111, len=193
+[7][Mon Jul 21 00:58:53 2025][2483](control.c:1683) Message content: { "version": "0.61.0", "hostname": "", "os": "Linux", "arch": "x86_64", "privilege_key": "d65211e0b7ec0813cc619aaabbb65a76", "pool_count": 1, "timestamp": 1753059533, "run_id": "00155D958200" }
+[7][Mon Jul 21 00:58:53 2025][2483](control.c:1464) Initializing control keepalive
+[7][Mon Jul 21 00:58:53 2025][2483](control.c:1483) Control keepalive initialized successfully
+[7][Mon Jul 21 00:58:53 2025][2483](client.c:434) No proxy client found for stream ID: 3
+[7][Mon Jul 21 00:58:53 2025][2483](tcpmux.c:947) Stream 3 send window increased by 6029312 to 6291254
+[7][Mon Jul 21 00:58:53 2025][2483](tcpmux.c:170) Current stream cleared
+[7][Mon Jul 21 00:58:53 2025][2483](client.c:434) No proxy client found for stream ID: 3
+[7][Mon Jul 21 00:58:53 2025][2483](login.c:163) xfrp login response: run_id: [00155D958200], version: [0.63.0]
+[6][Mon Jul 21 00:58:53 2025][2483](control.c:1151) Login successful - message length: 44, total length: 53, remaining: 0
+[7][Mon Jul 21 00:58:53 2025][2483](tcpmux.c:170) Current stream cleared
+[7][Mon Jul 21 00:58:53 2025][2483](client.c:434) No proxy client found for stream ID: 3
+[7][Mon Jul 21 00:58:53 2025][2483](control.c:1188) Processing control message: length=16
+[7][Mon Jul 21 00:58:53 2025][2483](control.c:826) Received only initialization vector data
+[7][Mon Jul 21 00:58:53 2025][2483](tcpmux.c:170) Current stream cleared
+[7][Mon Jul 21 00:58:53 2025][2483](client.c:434) No proxy client found for stream ID: 3
+[7][Mon Jul 21 00:58:53 2025][2483](control.c:1188) Processing control message: length=11
+[6][Mon Jul 21 00:58:54 2025][2483](control.c:341) Starting xfrp proxy services...
+[7][Mon Jul 21 00:58:54 2025][2483](control.c:359) Sending proxy service: ssh
+[7][Mon Jul 21 00:58:54 2025][2483](control.c:1956) Sending new proxy request: type=112, name=ssh, length=236
+[7][Mon Jul 21 00:58:54 2025][2483](control.c:74) xfrpc connection status set to: connected
+[7][Mon Jul 21 00:58:54 2025][2483](tcpmux.c:66) Added stream 5 to hash table
+[7][Mon Jul 21 00:58:54 2025][2483](tcpmux.c:210) Initialized stream 5 with state 0
+[7][Mon Jul 21 00:58:54 2025][2483](client.c:464) Created new proxy client with stream ID: 5
+[7][Mon Jul 21 00:58:54 2025][2483](control.c:218) New client through TCP mux: stream_id=5
+[7][Mon Jul 21 00:58:54 2025][2483](tcpmux.c:352) Sent window update: stream=5, delta=0, flags=1
+[7][Mon Jul 21 00:58:54 2025][2483](control.c:449) Sending new work connection request: length=28
+[7][Mon Jul 21 00:58:54 2025][2483](control.c:1681) Sending message: type=119, len=28
+[7][Mon Jul 21 00:58:54 2025][2483](control.c:1683) Message content: { "run_id": "00155D958200" }
+[7][Mon Jul 21 00:58:54 2025][2483](tcpmux.c:170) Current stream cleared
+[7][Mon Jul 21 00:58:54 2025][2483](tcpmux.c:947) Stream 5 send window increased by 6029312 to 6291419
+[7][Mon Jul 21 00:58:54 2025][2483](tcpmux.c:170) Current stream cleared
+[7][Mon Jul 21 00:58:54 2025][2483](client.c:434) No proxy client found for stream ID: 3
+[7][Mon Jul 21 00:58:54 2025][2483](control.c:1188) Processing control message: length=51
+[7][Mon Jul 21 00:58:54 2025][2483](tcpmux.c:170) Current stream cleared
+[7][Mon Jul 21 00:58:59 2025][2483](control.c:1188) Processing control message: length=96
+[7][Mon Jul 21 00:58:59 2025][2483](control.c:954) Proxy service [ssh] [(null):0] (/tmp/xfrpc-unix.sock) starting work connection. Remaining data length 0
+[3][Mon Jul 21 00:58:59 2025][2483](control.c:470) Unix socket connection failed to /tmp/xfrpc-unix.sock
+[7][Mon Jul 21 00:58:59 2025][2483](client.c:270) proxy server [192.168.1.10:6000] <---> client [127.0.0.1:0]
+[7][Mon Jul 21 00:58:59 2025][2483](tcpmux.c:170) Current stream cleared
+[7][Mon Jul 21 00:58:59 2025][2483](client.c:434) No proxy client found for stream ID: 3
+[7][Mon Jul 21 00:58:59 2025][2483](control.c:1188) Processing control message: length=11
+[7][Mon Jul 21 00:58:59 2025][2483](tcpmux.c:66) Added stream 7 to hash table
+[7][Mon Jul 21 00:58:59 2025][2483](tcpmux.c:210) Initialized stream 7 with state 0
+[7][Mon Jul 21 00:58:59 2025][2483](client.c:464) Created new proxy client with stream ID: 7
+[7][Mon Jul 21 00:58:59 2025][2483](control.c:218) New client through TCP mux: stream_id=7
+[7][Mon Jul 21 00:58:59 2025][2483](tcpmux.c:352) Sent window update: stream=7, delta=0, flags=1
+[7][Mon Jul 21 00:58:59 2025][2483](control.c:449) Sending new work connection request: length=28
+[7][Mon Jul 21 00:58:59 2025][2483](control.c:1681) Sending message: type=119, len=28
+[7][Mon Jul 21 00:58:59 2025][2483](control.c:1683) Message content: { "run_id": "00155D958200" }
+[7][Mon Jul 21 00:58:59 2025][2483](tcpmux.c:170) Current stream cleared
+[7][Mon Jul 21 00:58:59 2025][2483](tcpmux.c:170) Current stream updated
+[7][Mon Jul 21 00:58:59 2025][2483](tcpmux.c:878) Forwarding data to local proxy, length: 135
+[7][Mon Jul 21 00:58:59 2025][2483](tcpmux.c:170) Current stream cleared
+[7][Mon Jul 21 00:58:59 2025][2483](tcpmux.c:947) Stream 7 send window increased by 6029312 to 6291419
+[7][Mon Jul 21 00:58:59 2025][2483](tcpmux.c:170) Current stream cleared
+[7][Mon Jul 21 00:59:00 2025][2483](tcpmux.c:947) Stream 5 send window increased by 0 to 6291419
+[7][Mon Jul 21 00:59:00 2025][2483](tcpmux.c:170) Current stream cleared
+==2483== 
+==2483== Process terminating with default action of signal 2 (SIGINT)
+==2483==    at 0x4068347: ??? (syscall_cp.s:29)
+==2483==    by 0x4065CB4: __syscall_cp_c (pthread_cancel.c:33)
+==2483==    by 0x4043347: epoll_pwait (epoll.c:28)
+==2483==    by 0x4D2F92A: ??? (in /usr/lib/libevent-2.1.so.7.0.1)
+==2483==    by 0x4D27B75: event_base_loop (in /usr/lib/libevent-2.1.so.7.0.1)
+==2483==    by 0x118613: close_main_control (control.c:2146)
+==2483==    by 0x11AF30: xfrpc_loop (xfrpc.c:75)
+==2483==    by 0x10CC23: main (main.c:15)
+==2483== 
+==2483== HEAP SUMMARY:
+==2483==     in use at exit: 443,348 bytes in 5,043 blocks
+==2483==   total heap usage: 7,010 allocs, 1,967 frees, 965,318 bytes allocated
+==2483== 
+==2483== 4 bytes in 1 blocks are definitely lost in loss record 9 of 731
+==2483==    at 0x48B0733: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==2483==    by 0x406458B: strdup (strdup.c:7)
+==2483==    by 0x119E6C: new_proxy_resp_unmarshal (msg.c:494)
+==2483==    by 0x115DD9: handle_type_new_proxy_resp (control.c:877)
+==2483==    by 0x1163B2: handle_control_work (control.c:1025)
+==2483==    by 0x1168BA: handle_frps_msg (control.c:1189)
+==2483==    by 0x124039: process_data (tcpmux.c:868)
+==2483==    by 0x1248CE: handle_tcp_mux_stream (tcpmux.c:1174)
+==2483==    by 0x116D41: handle_tcp_mux (control.c:1286)
+==2483==    by 0x116EB8: recv_cb (control.c:1344)
+==2483==    by 0x4D1F1CC: bufferevent_run_readcb_ (in /usr/lib/libevent-2.1.so.7.0.1)
+==2483==    by 0x4D22C84: ??? (in /usr/lib/libevent-2.1.so.7.0.1)
+==2483== 
+==2483== 4 bytes in 1 blocks are definitely lost in loss record 10 of 731
+==2483==    at 0x48B0733: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==2483==    by 0x406458B: strdup (strdup.c:7)
+==2483==    by 0x11A2FC: start_work_conn_resp_unmarshal (msg.c:620)
+==2483==    by 0x115F41: handle_type_start_work_conn (control.c:929)
+==2483==    by 0x1163CC: handle_control_work (control.c:1028)
+==2483==    by 0x1168BA: handle_frps_msg (control.c:1189)
+==2483==    by 0x124039: process_data (tcpmux.c:868)
+==2483==    by 0x1248CE: handle_tcp_mux_stream (tcpmux.c:1174)
+==2483==    by 0x116D41: handle_tcp_mux (control.c:1286)
+==2483==    by 0x116EB8: recv_cb (control.c:1344)
+==2483==    by 0x4D1F1CC: bufferevent_run_readcb_ (in /usr/lib/libevent-2.1.so.7.0.1)
+==2483==    by 0x4D22C84: ??? (in /usr/lib/libevent-2.1.so.7.0.1)
+==2483== 
+==2483== 7 bytes in 1 blocks are definitely lost in loss record 16 of 731
+==2483==    at 0x48B0733: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==2483==    by 0x406458B: strdup (strdup.c:7)
+==2483==    by 0x11A084: login_resp_unmarshal (msg.c:550)
+==2483==    by 0x1164FA: process_login_response (control.c:1061)
+==2483==    by 0x116749: handle_login_response (control.c:1142)
+==2483==    by 0x116849: handle_frps_msg (control.c:1182)
+==2483==    by 0x124039: process_data (tcpmux.c:868)
+==2483==    by 0x1248CE: handle_tcp_mux_stream (tcpmux.c:1174)
+==2483==    by 0x116D41: handle_tcp_mux (control.c:1286)
+==2483==    by 0x116EB8: recv_cb (control.c:1344)
+==2483==    by 0x4D1F1CC: bufferevent_run_readcb_ (in /usr/lib/libevent-2.1.so.7.0.1)
+==2483==    by 0x4D22C84: ??? (in /usr/lib/libevent-2.1.so.7.0.1)
+==2483== 
+==2483== 13 bytes in 1 blocks are definitely lost in loss record 31 of 731
+==2483==    at 0x48B0733: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==2483==    by 0x406458B: strdup (strdup.c:7)
+==2483==    by 0x11A0DC: login_resp_unmarshal (msg.c:557)
+==2483==    by 0x1164FA: process_login_response (control.c:1061)
+==2483==    by 0x116749: handle_login_response (control.c:1142)
+==2483==    by 0x116849: handle_frps_msg (control.c:1182)
+==2483==    by 0x124039: process_data (tcpmux.c:868)
+==2483==    by 0x1248CE: handle_tcp_mux_stream (tcpmux.c:1174)
+==2483==    by 0x116D41: handle_tcp_mux (control.c:1286)
+==2483==    by 0x116EB8: recv_cb (control.c:1344)
+==2483==    by 0x4D1F1CC: bufferevent_run_readcb_ (in /usr/lib/libevent-2.1.so.7.0.1)
+==2483==    by 0x4D22C84: ??? (in /usr/lib/libevent-2.1.so.7.0.1)
+==2483== 
+==2483== LEAK SUMMARY:
+==2483==    definitely lost: 28 bytes in 4 blocks
+==2483==    indirectly lost: 0 bytes in 0 blocks
+==2483==      possibly lost: 0 bytes in 0 blocks
+==2483==    still reachable: 443,320 bytes in 5,039 blocks
+==2483==         suppressed: 0 bytes in 0 blocks
+==2483== Reachable blocks (those to which a pointer was found) are not shown.
+==2483== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==2483== 
+==2483== For lists of detected and suppressed errors, rerun with: -s
+==2483== ERROR SUMMARY: 4 errors from 4 contexts (suppressed: 0 from 0)

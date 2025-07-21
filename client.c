@@ -165,6 +165,10 @@ int is_iod_proxy(const struct proxy_service *ps) {
 	return is_proxy_type(ps, "iod", 1);
 }
 
+int is_unix_proxy(const struct proxy_service *ps) {
+	return is_proxy_type(ps, "unix", 1);
+}
+
 int has_service_type(const struct proxy_service *ps) {
 	if (!ps) return 0;
 
@@ -221,6 +225,8 @@ static int setup_local_connection(struct proxy_client *client)
 	
 	if (is_udp_proxy(ps)) {
 		client->local_proxy_bev = connect_udp_server(client->base);
+	} else if (is_unix_proxy(ps)) {
+		client->local_proxy_bev = connect_unix_server(client->base, ps->local_addr);
 	} else if (!is_socks5_proxy(ps) && !is_iod_proxy(ps) && !has_service_type(ps)) {
 		client->local_proxy_bev = connect_server(client->base, ps->local_ip, ps->local_port);
 	} else {
@@ -247,15 +253,15 @@ static int setup_local_connection(struct proxy_client *client)
  * @param client Pointer to the proxy_client structure containing the client configuration
  *              and connection details
  */
-void start_xfrp_tunnel(struct proxy_client *client)
+int start_xfrp_tunnel(struct proxy_client *client)
 {
-	if (!client || !client->ctl_bev || !client->base || !client->ps || !client->ps->local_port) {
+	if (!client || !client->ctl_bev || !client->base || !client->ps) {
 		debug(LOG_ERR, "Invalid client configuration");
-		return;
+		return 0;
 	}
 
 	if (setup_local_connection(client) <= 0) {
-		return;
+		return 0;
 	}
 
 	struct common_conf *c_conf = get_common_config();
@@ -277,6 +283,8 @@ void start_xfrp_tunnel(struct proxy_client *client)
 	bufferevent_setcb(client->local_proxy_bev, proxy_c2s_recv, NULL,
 					 xfrp_proxy_event_cb, client);
 	bufferevent_enable(client->local_proxy_bev, EV_READ|EV_WRITE);
+
+	return 1;
 }
 
 /**

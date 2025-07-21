@@ -34,6 +34,7 @@ void close_main_control(void);
 
 /* Server connection functions */
 struct bufferevent *connect_server(struct event_base *base, const char *name, const int port);
+struct bufferevent* connect_unix_server(struct event_base *base, const char *path);
 struct bufferevent *connect_udp_server(struct event_base *base);
 void connect_eventcb(struct bufferevent *bev, short events, void *ptr);
 
